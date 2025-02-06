@@ -33,6 +33,7 @@ if "restrict_regions" in config["processing"]:
         shell:
             "bedextract {params.contig} {input} > {output}"
 
+# variantes germinales
 rule call_variants:
     input:
         bam=lambda wc: get_sample_bams(wc.sample),
@@ -112,6 +113,7 @@ rule merge_variants:
     wrapper:
         "v3.5.0/bio/picard/mergevcfs"
 
+# junta los bams de todos los cromosomas
 rule merge_bams:
     input: lambda wc: get_sample_bams(wc.sample),
     output:
@@ -141,6 +143,7 @@ rule samtools_index_merged:
     wrapper:
         "v3.5.0/bio/samtools/index"
 
+# para variantes germinales
 rule mutect:
     input:
         map=lambda wc: get_merged_bam(wc.sample)[0],
