@@ -41,16 +41,13 @@ warning("Check if your genome contains alternative contigs and configure the exe
 
 warning("After each rule is executed, it generates a benchmark report. You can find them in the benchmarks directory within the logs directory. Please, adjust the parameters in the config file accordingly for subsequent executions.")
 
-##### Target rules #####
+##### Target rules para la entrega del trabajo del Máster#####
 
 rule all:
     input:
-        ["{OUTDIR}/annotated/{group}.snpeff.vcf.gz".format(OUTDIR=OUTDIR,group=getattr(row, 'group')) for row in samples.itertuples()],
-        ["{OUTDIR}/annotated/{group}.vep.vcf.gz".format(OUTDIR=OUTDIR,group=getattr(row, 'group')) for row in samples.itertuples()],
-        ["{OUTDIR}/annotated/{sample}_mutect.vep.vcf.gz".format(OUTDIR=OUTDIR,sample=getattr(row, 'sample')) for row in samples.itertuples() if (getattr(row, 'control') != "-")],
         f"{OUTDIR}/qc/multiqc.html",
-        [f"{OUTDIR}/plots/{{group}}.depths.svg".format(OUTDIR=OUTDIR,group=getattr(row, 'group')) for row in samples.itertuples()],
-        [f"{OUTDIR}/plots/{{group}}.allele-freqs.svg".format(OUTDIR=OUTDIR,group=getattr(row, 'group')) for row in samples.itertuples()]
+        f"{OUTDIR}/mutect_filter/{{sample}}_passlabel_filtered.vcf.gz",
+        f"{OUTDIR}/filtered/{{group}}.vcf.gz"
 
 
 ##### Modules #####
