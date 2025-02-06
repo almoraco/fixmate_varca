@@ -87,9 +87,25 @@ rule map_reads:
     wrapper:
         "v3.5.0/bio/bwa-mem2/mem"
 
+# Use samtools to correct mate information after BWA mapping.
+rule samtools_fixmate:
+    input:
+        bams=f"{OUTDIR}/mapped/{{sample}}-{{unit}}.sorted.bam",
+    output:
+        temp(f"{OUTDIR}/mapped/{{sample}}-{{unit}}.fixed.bam"),
+    log:
+        f"{LOGDIR}/samtools/fixmate/{{sample}}-{{unit}}.log",
+    message:
+        "Fixing mate information in {input.bams}"
+    threads: 1
+    params:
+        extra="",
+    wrapper:
+        "v5.6.1-1-g60c23ed/bio/samtools/fixmate/"
+
 rule mark_duplicates:
     input:
-        bams=f"{OUTDIR}/mapped/{{sample}}-{{unit}}.sorted.bam"
+        bams=f"{OUTDIR}/mapped/{{sample}}-{{unit}}.fixed.bam"
     output:
         bam=temp(f"{OUTDIR}/dedup/{{sample}}-{{unit}}.bam"),
         metrics=f"{OUTDIR}/qc/dedup/{{sample}}-{{unit}}.metrics.txt"
@@ -106,6 +122,7 @@ rule mark_duplicates:
     wrapper:
         "v3.5.0/bio/picard/markduplicates"
 
+# indexa el genoma
 checkpoint genome_faidx:
     input:
         config["ref"]["genome"]
@@ -122,6 +139,7 @@ checkpoint genome_faidx:
     wrapper:
         "v3.5.0/bio/samtools/faidx"
 
+# recalibra los scores de calidad de las bases
 rule obtain_recal_table:
     input:
         bam=get_recal_input(),
@@ -146,6 +164,7 @@ rule obtain_recal_table:
     wrapper:
         "v3.5.0/bio/gatk/baserecalibrator"
 
+# aplicamos la recalibración de las bases
 rule recalibrate_base_qualities:
     input:
         bam=get_recal_input(),
@@ -169,6 +188,7 @@ rule recalibrate_base_qualities:
     wrapper:
         "v3.5.0/bio/gatk/applybqsr"
 
+# indexa todos los bams
 rule samtools_index:
     input:
         f"{OUTDIR}/dedup/{{sample}}-{{unit}}.bam"
