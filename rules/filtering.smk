@@ -29,26 +29,6 @@ def get_filter(wildcards):
         config["filtering"]["hard"][wildcards.vartype]}
 
 
-rule hard_filter_calls:
-    input:
-        ref=config["ref"]["genome"],
-        vcf=f"{OUTDIR}/filtered/{{group}}.{{vartype}}.vcf.gz"
-    output:
-        vcf=temp(f"{OUTDIR}/filtered/{{group}}.{{vartype}}.hardfiltered.vcf.gz")
-    params:
-        filters=get_filter,
-        java_opts="-XX:ParallelGCThreads={}".format(get_resource("hard_filter_calls","threads"))
-    log:
-        f"{LOGDIR}/gatk/variantfiltration/{{group}}.{{vartype}}.log"
-    resources:
-        mem_mb = get_resource("hard_filter_calls","mem_mb"),
-        runtime = get_resource("hard_filter_calls","runtime")
-    benchmark:
-        f"{LOGDIR}/benchmarks/{{group}}.{{vartype}}.hard_filter_calls.txt"
-    wrapper:
-        "v3.5.0/bio/gatk/variantfiltration"
-
-
 rule recalibrate_calls:
     input:
         vcf=f"{OUTDIR}/filtered/{{group}}.{{vartype}}.vcf.gz",
