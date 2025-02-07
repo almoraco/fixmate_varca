@@ -128,10 +128,6 @@ resources:
         mem_mb: 8000
         threads: 1
         runtime: 480
-    hard_filter_calls:
-        mem_mb: 8000
-        threads: 1
-        runtime: 480
     trim_reads:
         mem_mb: 4000
         threads: 16
