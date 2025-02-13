@@ -1,29 +1,26 @@
-samples: /home/vant/Documentos/Master/aligments/trabajo_final/varca/samples.tsv
-units: /home/vant/Documentos/Master/aligments/trabajo_final/varca/units.tsv
-contigs: /home/vant/Documentos/Master/aligments/trabajo_final/varca/contigs.tsv
+samples: /home/vant/Documentos/Master/aligments/trabajo_final/chr08/samples.tsv
+units: /home/vant/Documentos/Master/aligments/trabajo_final/chr08/units.tsv
+contigs: /home/vant/Documentos/Master/aligments/trabajo_final/chr08/contigs.tsv
 
-outdir: "/home/vant/Documentos/Master/aligments/trabajo_final/varca/chr8/varca_out"
-logdir: "/home/vant/Documentos/Master/aligments/trabajo_final/varca/chr8/varca_log"
+outdir: "/home/vant/Documentos/Master/aligments/trabajo_final/chr08/08_out"
+logdir: "/home/vant/Documentos/Master/aligments/trabajo_final/chr08/08_log"
 
 ref:
   # Path to the reference genome, ideally as it is provided by the GATK bundle.
-  genome: /home/vant/Documentos/Master/aligments/trabajo_final/varca/chr8/indexes/hg19_8.fa
+  genome: /home/vant/Documentos/Master/aligments/trabajo_final/chr08/hg19_8.fa
   # Path to the directory with the reference indexes for the aligment. Indexes will be retrieve from this directory or created in it if they do not exist
-  # aquí te crea el .fai
-  genome_idx: /home/vant/Documentos/Master/aligments/trabajo_final/varca/chr8/indexes/
-  # If the reference genome contains alternative contigs, set 'genome_alt' to true to account for their presence in the alignment.
-  # The corresponding '.alt' index file should be present in the genome index directory with the same basename as the reference genome.
-  # For more details, please, visit https://github.com/lh3/bwa/blob/master/README-alt.md and https://gatk.broadinstitute.org/hc/en-us/articles/360037498992--How-to-Map-reads-to-a-reference-with-alternate-contigs-like-GRCH38.
+  genome_idx: /home/vant/Documentos/Master/aligments/trabajo_final/chr08
+  # If the reference genome contains alternative contigs, set 'genome_alt' to true to account for their presence in the alignment. The corresponding '.alt' index file should be present in the genome index directory with the same basename as the reference genome. For more details, please, visit https://github.com/lh3/bwa/blob/master/README-alt.md and https://gatk.broadinstitute.org/hc/en-us/articles/360037498992--How-to-Map-reads-to-a-reference-with-alternate-contigs-like-GRCH38.
   genome_alt: false
   # Path to any database of known variants, ideally as it is provided by the GATK bundle. This file has to be compressed in bgzip format.
-  known_variants: /home/vant/Documentos/Master/aligments/trabajo_final/varca/chr8/dbsnp_150.hg19_8.vcf.gz
+  known_variants: /home/vant/Documentos/Master/aligments/trabajo_final/chr08/dbsnp_150.hg19_8.vcf.gz
 
 filtering:
   # Set to true in order to apply machine learning based recalibration of
   # quality scores instead of hard filtering.
   vqsr: false
   hard:
-    # hard filtering NOT as outlined in GATK docs. Es para el trabajo del Máster
+    # hard filtering as outlined in GATK docs
     # (https://gatkforums.broadinstitute.org/gatk/discussion/2806/howto-apply-hard-filters-to-a-call-set)
     snvs:
       "QD < 2.0 || QUAL < 20.0 || DP < 20.0 || SOR > 3.0 || FS > 60.0 || MQ < 40.0 || MQRankSum < -12.5 || ReadPosRankSum < -8.0"
@@ -39,7 +36,7 @@ processing:
   remove_duplicates: true
   # Uncomment and point to a bed file with, e.g., captured regions if necessary,
   # see https://gatkforums.broadinstitute.org/gatk/discussion/4133/when-should-i-use-l-to-pass-in-a-list-of-intervals.
-  restrict_regions: /home/vant/Documentos/Master/aligments/trabajo_final/varca/chr8/S07604514_Regions_V6_8.bed
+  restrict_regions: /home/vant/Documentos/Master/aligments/trabajo_final/chr08/S07604514_Regions_V6_8.bed
   # If regions are restricted, uncomment this to enlarge them by the given value in order to include
   # flanking areas.
   # region_padding: 100
@@ -125,6 +122,10 @@ resources:
         threads: 1
         runtime: 480
     recalibrate_calls:
+        mem_mb: 8000
+        threads: 1
+        runtime: 480
+    hard_filter_calls:
         mem_mb: 8000
         threads: 1
         runtime: 480
