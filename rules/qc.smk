@@ -13,7 +13,7 @@ rule fastqc_untrimmed:
     benchmark:
         f"{LOGDIR}/benchmarks/{{sample}}-{{unit}}-{{read}}.fastqc.txt"
     wrapper:
-        "v3.5.0/bio/fastqc"
+        "v5.7.0/bio/fastqc"
 
 rule fastqc_trimmed:
     input:
@@ -107,6 +107,7 @@ if "restrict_regions" in config["processing"]:
         wrapper:
             "v3.5.0/bio/picard/collecthsmetrics"
 
+# varios controles de calidad en un informe final
 rule multiqc:
     input:
          [expand(f"{OUTDIR}/qc/fastqc/{row.sample}-{row.unit}-{{r}}_fastqc.zip", r=["r1"]) for row in units.itertuples() if (str(getattr(row, 'fq2')) == "nan")],

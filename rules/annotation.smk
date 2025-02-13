@@ -112,4 +112,4 @@ rule vep_mutect:
     benchmark:
         f"{LOGDIR}/benchmarks/{{sample}}.vep_mutect.txt"
     wrapper:
-        "v3.5.0/bio/vep/annotate"
+        "v4.7.6/bio/vep/annotate" # actualizado desde la 3.5.0 original

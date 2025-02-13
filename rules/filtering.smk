@@ -59,13 +59,11 @@ rule recalibrate_calls:
     wrapper:
         "v3.5.0/bio/gatk/variantrecalibrator"
 
+# esto es lo que hay que entregar
 rule merge_calls:
     input:
-        vcfs=lambda wc: expand(f"{OUTDIR}/filtered/{wc.group}.{{vartype}}.{{filtertype}}.vcf.gz",
-                   vartype=["snvs", "indels"],
-                   filtertype="recalibrated"
-                              if config["filtering"]["vqsr"]
-                              else "hardfiltered")
+        vcfs=lambda wc: expand(f"{OUTDIR}/filtered/{wc.group}.{{vartype}}.vcf.gz",
+                   vartype=["snvs", "indels"])
     output:
         vcf=f"{OUTDIR}/filtered/{{group}}.vcf.gz"
     params:
@@ -81,6 +79,7 @@ rule merge_calls:
     wrapper:
         "v3.5.0/bio/picard/mergevcfs"
 
+# filtros de contaminación et al.
 rule learn_read_orientation_model:
     input:
         f1r2=f"{OUTDIR}/mutect/{{sample}}.f1r2.tar.gz"
@@ -119,6 +118,7 @@ rule filter_mutect_calls:
     wrapper:
         "v3.5.0/bio/gatk/filtermutectcalls"
 
+# esto es lo que hay que entregar
 rule filter_mutect_2:
     input:
         vcf=f"{OUTDIR}/mutect_filter/{{sample}}_passlabel.vcf.gz",

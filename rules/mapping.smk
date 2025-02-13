@@ -67,7 +67,7 @@ rule bwa_idx_genome:
 rule map_reads:
     input:
         reads=get_trimmed_reads,
-        idx=multiext(f"{config['ref']['genome_idx']}"+os.path.basename(config['ref']['genome']), ".amb", ".ann", ".bwt.2bit.64", ".pac"),
+        idx=multiext(f"{config['ref']['genome_idx']}"+os.path.basename(config['ref']['genome']), ".amb", ".ann", ".bwt.2bit.64", ".pac")[0],
         alt=f"{config['ref']['genome_idx']}"+os.path.basename(config['ref']['genome'])+".alt" if config['ref']['genome_alt'] else []
     output:
         temp(f"{OUTDIR}/mapped/{{sample}}-{{unit}}.sorted.bam")
@@ -76,7 +76,7 @@ rule map_reads:
     params:
         extra=get_read_group,
         sort="samtools",
-        sort_order="coordinate"
+        sort_order="queryname" # el original era "coordinate" pero para samtools_fixmate se necesita por nombre de query
     shadow: "shallow"
     threads: get_resource("map_reads","threads")
     resources:
@@ -103,9 +103,28 @@ rule samtools_fixmate:
     wrapper:
         "v5.6.1-1-g60c23ed/bio/samtools/fixmate/"
 
+# Como MarkDuplicates va a necesitar los BAM ordenados por coordenadas
+# tenemos que volver a ordenarlo no por queryname
+rule sort_bam:
+    input:
+        f"{OUTDIR}/mapped/{{sample}}-{{unit}}.fixed.bam"
+    output:
+        temp(f"{OUTDIR}/mapped/{{sample}}-{{unit}}.coordinate.bam")
+    log:
+        f"{LOGDIR}/samtools/sort/{{sample}}-{{unit}}.log"
+    params:
+        extra="-m 4G",
+        tmp_dir="/tmp"
+    threads: 8
+    resources:
+        mem_mb=16000
+    wrapper:
+        "v3.5.0/bio/samtools/sort"
+
+
 rule mark_duplicates:
     input:
-        bams=f"{OUTDIR}/mapped/{{sample}}-{{unit}}.fixed.bam"
+        bams=f"{OUTDIR}/mapped/{{sample}}-{{unit}}.coordinate.bam"
     output:
         bam=temp(f"{OUTDIR}/dedup/{{sample}}-{{unit}}.bam"),
         metrics=f"{OUTDIR}/qc/dedup/{{sample}}-{{unit}}.metrics.txt"
@@ -162,7 +181,7 @@ rule obtain_recal_table:
     benchmark:
         f"{LOGDIR}/benchmarks/{{sample}}-{{unit}}.obtain_recal_table.txt"
     wrapper:
-        "v3.5.0/bio/gatk/baserecalibrator"
+        "v5.7.0/bio/gatk/baserecalibrator"
 
 # aplicamos la recalibración de las bases
 rule recalibrate_base_qualities:

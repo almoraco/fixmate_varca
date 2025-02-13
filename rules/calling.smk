@@ -53,7 +53,7 @@ rule call_variants:
     benchmark:
         f"{LOGDIR}/benchmarks/{{sample}}.{{contig}}.call_variants.txt"
     wrapper:
-        "v3.5.0/bio/gatk/haplotypecaller"
+        "v5.7.0/bio/gatk/haplotypecaller"
 
 
 rule combine_calls:
